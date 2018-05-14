@@ -1,14 +1,17 @@
 package net.webella.weatherstation.monitor;
 
+import java.util.Observable;
+import java.util.Observer;
+
 public class ForecastDisplay implements Observer, DisplayElement {
 
-	private Subject weatherData;
+	private Observable observable;
 	private float currentPressure = 29.92f;  
 	private float lastPressure;
 	
-	public ForecastDisplay(WeatherData weatherData) {
-		this.weatherData = weatherData;
-		weatherData.registerObserver(this);
+	public ForecastDisplay(Observable observable) {
+		this.observable = observable;
+		observable.addObserver(this);
 	}
 
 	public void display() {
@@ -23,11 +26,14 @@ public class ForecastDisplay implements Observer, DisplayElement {
 		}
 	}
 
-	public void update(float temp, float humidity, float pressure) {
-		lastPressure = currentPressure;
-		currentPressure = pressure;
-
-		display();
+	public void update(Observable obs, Object arg) {
+		
+		if (obs instanceof WeatherData) {
+			lastPressure = currentPressure;
+			WeatherData weatherData = (WeatherData)obs;
+			currentPressure = weatherData.getPressure();
+			display();
+		}
 
 	}
 

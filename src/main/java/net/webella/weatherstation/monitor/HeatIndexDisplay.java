@@ -1,13 +1,16 @@
 package net.webella.weatherstation.monitor;
 
+import java.util.Observable;
+import java.util.Observer;
+
 public class HeatIndexDisplay implements Observer, DisplayElement {
 
-	private Subject weatherData;
 	private float heatIndex; 
+	private Observable observable;
 	
-	public HeatIndexDisplay(WeatherData weatherData) {
-		this.weatherData = weatherData;
-		weatherData.registerObserver(this);
+	public HeatIndexDisplay(Observable observable) {
+		this.observable = observable;
+		observable.addObserver(this);
 	}
 
 	public void display() {
@@ -15,9 +18,12 @@ public class HeatIndexDisplay implements Observer, DisplayElement {
 
 	}
 
-	public void update(float temp, float humidity, float pressure) {
-		heatIndex = computeHeatIndex(temp, humidity);
-		display();
+	public void update(Observable obs, Object arg) {
+		if (obs instanceof WeatherData) {
+			WeatherData weatherData = (WeatherData)obs;
+			heatIndex = computeHeatIndex(weatherData.getTemperature(), weatherData.getHumidity());
+			display();
+		}
 
 	}
 	private float computeHeatIndex(float t, float rh) {
